@@ -1,0 +1,39 @@
+ID: wgrunt
+_schema-version: "2.1"
+description: With Grunt
+version: 0.0.1
+modules:
+  - name: wgrunt-db
+    type: hdb
+    path: db
+    parameters:
+      memory: 256M
+      disk-quota: 256M
+    requires:
+      - name: wgrunt-db-hdi-container
+  - name: wgrunt-srv
+    type: nodejs
+    path: srv
+    parameters:
+      memory: 512M
+      disk-quota: 256M
+    provides:
+      - name: srv_api
+        properties:
+          url: ${default-url}
+    requires:
+      - name: wgrunt-db-hdi-container
+      - name: wgrunt-uaa
+resources:
+  - name: wgrunt-db-hdi-container
+    type: com.sap.xs.hdi-container
+    properties:
+      hdi-container-name: ${service-name}
+  - name: wgrunt-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service-plan: application
+      service: xsuaa
+      config:
+        xsappname: wgrunt-${space}
+        tenant-mode: dedicated
